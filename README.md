@@ -7,49 +7,49 @@ A production-grade microservice designed for **Revenue Cycle Management (RCM)**,
 ```mermaid
 graph TD
     subgraph "AI Agent Layer"
-        AI[AI Agent / Frontend]
+        AI["AI Agent / Frontend"]
     end
 
     subgraph "Resilient Gateway (NestJS)"
-        CTRL[AppController]
+        CTRL["AppController"]
         subgraph "Middleware & Guards"
-            SEC[API Key & Helmet]
-            THROT[Throttler / Rate Limit]
-            IDEM[Idempotency Interceptor]
+            SEC["API Key & Helmet"]
+            THROT["Throttler / Rate Limit"]
+            IDEM["Idempotency Interceptor"]
         end
-        CACHE[(Idempotency Cache)]
-        RES[Resilience Engine]
-        ELIG[Eligibility Service]
-        SQS[SQS Service]
+        CACHE[("Idempotency Cache")]
+        RES["Resilience Engine"]
+        ELIG["Eligibility Service"]
+        SQS["SQS Service"]
     end
 
     subgraph "Observability"
-        LOGS[(Structured Logs <br/> PHI REDACTED)]
+        LOGS[("Structured Logs - PHI REDACTED")]
     end
 
     subgraph "External Systems"
-        CH[Clearinghouse API <br/>(Flaky/Slow)]
-        AWS[AWS SQS <br/>(Retry Queue)]
+        CH["Clearinghouse API (Flaky/Slow)"]
+        AWS["AWS SQS (Retry Queue)"]
     end
 
-    AI -->|POST /eligibility/verify| CTRL
+    AI -->|"POST /eligibility/verify"| CTRL
     CTRL --> SEC
     SEC --> THROT
     THROT --> IDEM
-    IDEM <-->|Check/Store| CACHE
+    IDEM <-->|"Check/Store"| CACHE
     IDEM --> RES
 
-    RES -->|1. Try| ELIG
-    ELIG -->|Logger| LOGS
-    ELIG -.->|X12 270/271| CH
+    RES -->|"1. Try"| ELIG
+    ELIG -->|"Logger"| LOGS
+    ELIG -.->|"X12 270/271"| CH
     
-    RES -->|2. Exponential Backoff| ELIG
-    RES -->|3. Circuit Breaker| ELIG
-    RES -->|4. Fallback| SQS
+    RES -->|"2. Exponential Backoff"| ELIG
+    RES -->|"3. Circuit Breaker"| ELIG
+    RES -->|"4. Fallback"| SQS
     
-    SQS -->|Push| AWS
+    SQS -->|"Push"| AWS
     
-    RES -.->|AI-Ready Response| AI
+    RES -.->|"AI-Ready Response"| AI
 ```
 
 ## Production-Grade Features
