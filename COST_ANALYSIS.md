@@ -10,7 +10,7 @@ The `opossum` library operates as an in-memory state machine.
 - **Circuit Closed Execution**: Under normal conditions, the only overhead is the addition of an entry to a rolling window of statistics.
 
 ## 2. Log Volume and Storage
-Logging costs are proportional to the granularity of your instrumentation.
+Logging costs are proportional to the granularity of system instrumentation.
 
 - **State Transitions**: Logs are generated only when the circuit changes state (e.g., CLOSED -> OPEN). In a stable system, this is rare.
 - **Failures**: While every failed attempt is logged, the CB actually **reduces** log volume during an outage by preventing repeated, failing calls to the clearinghouse. Instead of 1000 "Connection Refused" logs, you get a few transition logs and 1000 "Circuit Open" logs (which can be sampled or suppressed).
@@ -26,6 +26,20 @@ The "cost" of the CB is a net-positive when considering business operations:
 - **Egress Costs**: Prevents redundant API calls to external Clearinghouses during failure periods, which can save transaction-based fees.
 - **User Experience**: AI Agents receive an immediate `QUEUED` status instead of hanging for 5 seconds. This allows the AI to provide faster feedback to the patient.
 - **System Stability**: Prevents "Cascading Failures" where multiple services wait on a single slow dependency, eventually consuming all available threads and crashing the entire platform.
+
+## 5. Cost per 1M Transactions
+
+*Estimates based on **AWS us-east-1** region pricing.*
+
+| Component | Estimated Cost (per 1M Trans) | Calculation Logic |
+| :--- | :--- | :--- |
+| **Compute Overhead** | ~$0.50 - $1.00 | Incremental CPU/RAM for state tracking |
+| **SQS Fallback Storage** | ~$0.04 | Assuming 10% fallback rate (100k messages) |
+| **Log Storage** | ~$0.20 | Standard structured log output |
+| **Total Technical Cost** | **~$0.74 - $1.24** | **Negligible at scale** |
+
+### ROI and Savings
+If a Clearinghouse charges **$0.10 per verification attempt**, and the Circuit Breaker suppresses **100,000 redundant requests** during a service outage, the Resilience Layer generates **$10,000 in direct cost savings** per 1M processed transactions.
 
 ## Summary
 The technical cost of adding a Circuit Breaker is **negligible** (sub-millisecond latency, minimal RAM). The primary investment is in **Configuration Complexity** (tuning thresholds) rather than resource utilization.

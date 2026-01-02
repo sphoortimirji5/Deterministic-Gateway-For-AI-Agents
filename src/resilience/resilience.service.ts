@@ -28,12 +28,19 @@ export class ResilienceService implements OnModuleInit {
         });
 
         this.breaker.fallback(async (data: any, error: any) => {
-            this.logger.warn(`Fallback triggered! Circuit state: ${this.breaker.opened ? 'OPEN' : 'CLOSED'}`);
-            await this.sqsService.pushToRetryQueue({ data, error: error.message });
+            const isExhausted = error.message.includes('All retries exhausted');
+            this.logger.warn(`Fallback triggered! Circuit state: ${this.breaker.opened ? 'OPEN' : 'CLOSED'} | Type: ${isExhausted ? 'DLQ' : 'RETRY'}`);
+
+            if (isExhausted) {
+                await this.sqsService.pushToDLQ({ data, error: error.message });
+            } else {
+                await this.sqsService.pushToRetryQueue({ data, error: error.message });
+            }
+
             return {
                 status: 'QUEUED',
                 resolution_path: 'SPOOL_TO_SQS',
-                message: 'Eligibility request accepted for asynchronous processing',
+                message: isExhausted ? 'Request failed and moved to DLQ' : 'Request queued for retry',
                 reason: error.message
             };
         });

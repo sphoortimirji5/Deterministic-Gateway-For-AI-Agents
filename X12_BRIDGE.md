@@ -9,7 +9,7 @@ In the Healthcare Revenue Cycle Management (RCM) ecosystem, communication styles
 
 ## The Gateway's Role
 
-You are the translator that keeps both parties satisfied without either needing to learn the other's language.
+The gateway acts as the translator that keeps both parties satisfied without either needing to learn the other's language.
 
 ### 1. The Inquiry: JSON to X12 270
 
@@ -61,7 +61,7 @@ MSG*ELIGIBLE - ACTIVE COVERAGE~
 ## Why This Bridge Matters
 
 1. **Abstraction**: AI Agents shouldn't have to parse positional strings or handle NPI validation complexities.
-2. **Standardization**: By converting multiple clearinghouse formats (Availity, Change, Waystar) into a single JSON schema, you make the AI Agent vendor-agnostic.
+2. **Standardization**: By converting multiple clearinghouse formats (Availity, Change, Waystar) into a single JSON schema, the gateway makes the AI Agent vendor-agnostic.
 3. **Resilience**: Because X12 systems are often slow or batch-oriented, the bridge handles the "wait" by providing the `QUEUED` status, keeping the AI Agent's execution flow non-blocking.
 
 ## Summary

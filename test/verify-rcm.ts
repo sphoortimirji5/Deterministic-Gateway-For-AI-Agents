@@ -8,6 +8,10 @@ async function runRCMVerification() {
             patient_name: `Patient_${i + 1}`,
             payer_id: `PAYER_${100 + (i % 5)}`,
             batch_id: 'rcm_morning_batch'
+        }, {
+            headers: {
+                'x-api-key': 'dev-key-123'
+            }
         }).then(res => ({ id: i + 1, data: res.data }))
             .catch(err => ({ id: i + 1, error: err.message, status: err.response?.status }));
     });

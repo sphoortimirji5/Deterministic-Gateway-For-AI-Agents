@@ -16,17 +16,12 @@ export class SQSService {
     }
 
     async pushToRetryQueue(payload: any) {
-        this.logger.warn(`Pushing failed request to SQS: ${JSON.stringify(payload)}`);
+        this.logger.warn(`Pushing request to Retry Queue: ${JSON.stringify(payload)}`);
+        this.logger.log('Successfully pushed to SQS Retry Queue (simulated)');
+    }
 
-        // In a real production environment, uncomment this
-        /*
-        const command = new SendMessageCommand({
-          QueueUrl: this.queueUrl,
-          MessageBody: JSON.stringify(payload),
-        });
-        await this.sqsClient.send(command);
-        */
-
-        this.logger.log('Successfully pushed to SQS (simulated)');
+    async pushToDLQ(payload: any) {
+        this.logger.error(`CRITICAL: Pushing request to DLQ after exhaustion: ${JSON.stringify(payload)}`);
+        this.logger.log('Successfully pushed to SQS DLQ (simulated)');
     }
 }
