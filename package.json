@@ -1,0 +1,48 @@
+{
+  "name": "deterministic-gateway-for-ai-agents",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "ts-node src/main.ts",
+    "test": "jest",
+    "stress": "ts-node test/stress-test.ts",
+    "verify": "ts-node test/verify-prod.ts",
+    "verify-rcm": "ts-node test/verify-rcm.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-sqs": "^3.960.0",
+    "@nestjs/common": "^11.1.11",
+    "@nestjs/config": "^4.0.2",
+    "@nestjs/core": "^11.1.11",
+    "@nestjs/microservices": "^11.1.11",
+    "@nestjs/platform-express": "^11.1.11",
+    "@nestjs/throttler": "^6.5.0",
+    "axios": "^1.13.2",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.3",
+    "helmet": "^8.1.0",
+    "node-cache": "^5.1.2",
+    "opossum": "^9.0.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  },
+  "devDependencies": {
+    "@nestjs/testing": "^11.1.11",
+    "@types/autocannon": "^7.12.7",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^25.0.3",
+    "@types/opossum": "^8.1.9",
+    "@types/supertest": "^6.0.3",
+    "@types/validator": "^13.15.10",
+    "autocannon": "^8.0.0",
+    "jest": "^30.2.0",
+    "supertest": "^7.1.4",
+    "ts-jest": "^29.4.6"
+  }
+}
