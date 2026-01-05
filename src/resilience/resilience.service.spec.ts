@@ -33,6 +33,9 @@ describe('ResilienceService', () => {
                         get: jest.fn().mockImplementation((key) => {
                             if (key === 'CB_TIMEOUT') return 10000;
                             if (key === 'CB_RESET_TIMEOUT') return 1000;
+                            if (key === 'CB_ERROR_THRESHOLD') return 50;
+                            if (key === 'CB_VOLUME_THRESHOLD') return 10;
+                            if (key === 'CB_WINDOW') return 300000; // 300s window
                             return null;
                         }),
                     },
@@ -80,5 +83,29 @@ describe('ResilienceService', () => {
 
         expect(eligibilityService.verify).toHaveBeenCalledTimes(1);
         expect(result).toEqual(successResult);
+    });
+
+    it('should not open circuit before volumeThreshold is reached', async () => {
+        const error = new HttpException('API Error', HttpStatus.INTERNAL_SERVER_ERROR);
+        (eligibilityService.verify as jest.Mock).mockRejectedValue(error);
+
+        // Make 9 calls (threshold is 10)
+        for (let i = 0; i < 9; i++) {
+            const promise = service.execute({ patient_name: 'Test' });
+            // Advanced timer enough to cover retries (10s > 7s)
+            await Promise.resolve();
+            jest.advanceTimersByTime(10000);
+            await promise;
+        }
+
+        expect(service['breaker'].opened).toBe(false);
+
+        // 10th call should trip it
+        const promise = service.execute({ patient_name: 'Test' });
+        await Promise.resolve();
+        jest.advanceTimersByTime(10000);
+        await promise;
+
+        expect(service['breaker'].opened).toBe(true);
     });
 });

@@ -1,15 +1,22 @@
 import { Injectable, HttpException, HttpStatus, Logger } from '@nestjs/common';
 import { IEligibilityService } from '../interfaces/eligibility.interface';
+import { scrubPHI } from '../common/utils/phi-scrubber';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class EligibilityService implements IEligibilityService {
     private readonly logger = new Logger(EligibilityService.name);
 
+    constructor(private readonly configService: ConfigService) { }
+
     async verify(data: any): Promise<any> {
-        this.logger.log(`Verifying insurance for: ${data.patient_name}`);
+        const scrubbedData = scrubPHI(data);
+        this.logger.log(`Verifying insurance for: ${scrubbedData.patient_name}`);
+
+        const failureRate = this.configService.get<number>('MOCK_FAILURE_RATE') ?? 0.6;
 
         // Simulate flakiness of clearinghouse APIs
-        if (Math.random() < 0.6) {
+        if (Math.random() < failureRate) {
             this.logger.error('Clearinghouse Timeout / Error');
             throw new HttpException('Clearinghouse API Unavailable', HttpStatus.INTERNAL_SERVER_ERROR);
         }

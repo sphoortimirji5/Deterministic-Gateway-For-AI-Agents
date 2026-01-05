@@ -20,11 +20,16 @@ export class ResilienceService implements OnModuleInit {
     onModuleInit() {
         const timeout = this.configService.get<number>('CB_TIMEOUT') || 5000;
         const resetTimeout = this.configService.get<number>('CB_RESET_TIMEOUT') || 10000;
+        const errorThresholdPercentage = this.configService.get<number>('CB_ERROR_THRESHOLD') || 50;
+        const volumeThreshold = this.configService.get<number>('CB_VOLUME_THRESHOLD') || 100;
+        const rollingCountTimeout = this.configService.get<number>('CB_WINDOW') || 10000;
 
         this.breaker = new CircuitBreaker(this.executeWithRetry.bind(this), {
             timeout,
             resetTimeout,
-            errorThresholdPercentage: 50,
+            errorThresholdPercentage,
+            volumeThreshold,
+            rollingCountTimeout,
         });
 
         this.breaker.fallback(async (data: any, error: any) => {

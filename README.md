@@ -60,7 +60,7 @@ graph TD
 - **Input Validation**: Strict DTO validation using `class-validator` to prevent malformed injections.
 
 ### Reliability and Performance
-- **Circuit Breaker**: Instrumented with `opossum` to prevent system exhaustion during downstream outages.
+- **Circuit Breaker**: Instrumented with `opossum` to prevent system exhaustion during downstream outages. Configured with a default **100-call volume threshold** and **50% error threshold**.
 - **Exponential Backoff**: RxJS-powered intelligent retries (1s, 2s, 4s). *This is a standard industry practice to avoid overwhelming failing systems.*
 - **Rate Limiting**: Protects downstream clearinghouses from AI Agent "loops" or spikes (10 req/min limit).
 - **Idempotency**: `x-idempotency-key` support via local cache to prevent duplicate RCM transactions.
@@ -77,6 +77,10 @@ Create a `.env` file in the root directory:
 ```env
 CB_TIMEOUT=5000
 CB_RESET_TIMEOUT=10000
+CB_VOLUME_THRESHOLD=100
+CB_ERROR_THRESHOLD=50
+CB_WINDOW=10000
+MOCK_FAILURE_RATE=0.6
 SQS_QUEUE_URL=eligibility-retry-queue
 AWS_REGION=us-east-1
 API_KEY=secure-api-key
@@ -99,7 +103,7 @@ The **AI Agent** (or automated producer) submits a standard JSON payload represe
 ### Request Body (POST /eligibility/verify)
 ```json
 {
-  "patient_name": "Sphoorti Mirji",
+  "patient_name": "John Doe",
   "payer_id": "BCBS_001",
   "batch_id": "B_2026_01"
 }
